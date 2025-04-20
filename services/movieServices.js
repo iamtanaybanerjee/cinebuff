@@ -6,6 +6,7 @@ const {
   curatedListItem: curatedListItemModel,
 } = require("../models");
 const axiosInstance = require("../lib/axios.lib");
+const { Op } = require("sequelize");
 require("dotenv").config();
 
 const updateACuratedList = async (body, id) => {
@@ -133,4 +134,28 @@ const getMovieCast = async (id) => {
   }
 };
 
-module.exports = { updateACuratedList, saveMovie };
+const searchByGenreAndActor = async (genre, actor) => {
+  const genreList = genre.split(",").map((g) => g.trim());
+  const actorList = actor.split(",").map((a) => a.trim());
+
+  const genreConditions = genreList.map((g) => ({
+    genre: {
+      [Op.like]: `%${g}%`,
+    },
+  }));
+
+  const actorConditions = actorList.map((a) => ({
+    actors: {
+      [Op.like]: `%${a}%`,
+    },
+  }));
+
+  const movies = await movieModel.findAll({
+    where: {
+      [Op.and]: [...genreConditions, ...actorConditions],
+    },
+  });
+  return movies;
+};
+
+module.exports = { updateACuratedList, saveMovie, searchByGenreAndActor };

@@ -60,6 +60,22 @@ const validateMovieId = async (movieId) => {
   return error;
 };
 
+const validateGenre = (genre) => {
+  let error;
+
+  if (!genre) error = "Genre is required";
+
+  return error;
+};
+
+const validateActor = (actor) => {
+  let error;
+
+  if (!actor) error = "Actor is required";
+
+  return error;
+};
+
 module.exports = {
   validateSearchQuery,
   validateCuratedListBodyParams,
@@ -67,4 +83,6 @@ module.exports = {
   validateCuratedListId,
   validateReviewAndRating,
   validateMovieId,
+  validateGenre,
+  validateActor,
 };

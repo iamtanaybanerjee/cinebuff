@@ -6,12 +6,18 @@ const {
   validateCuratedListId,
   validateReviewAndRating,
   validateMovieId,
+  validateGenre,
+  validateActor,
 } = require("../validations/validations");
 const {
   curatedList: curatedListModel,
   review: reviewModel,
 } = require("../models");
-const { updateACuratedList, saveMovie } = require("../services/movieServices");
+const {
+  updateACuratedList,
+  saveMovie,
+  searchByGenreAndActor,
+} = require("../services/movieServices");
 
 const searchMovies = async (req, res) => {
   const query = req.query.query;
@@ -161,6 +167,29 @@ const addReviewRatingToMovie = async (req, res) => {
   }
 };
 
+const searchMoviesByGenreAndActor = async (req, res) => {
+  const genre = req.query.genre;
+  const actor = req.query.actor;
+  try {
+    const error = validateGenre(genre);
+    if (error) return res.status(400).json({ error });
+
+    const error2 = validateActor(actor);
+    if (error2) return res.status(400).json({ error: error2 });
+
+    const movies = await searchByGenreAndActor(genre, actor);
+
+    if (movies.length === 0)
+      return res.status(404).json({
+        message: `No movies are found with genre ${genre} and actor ${actor}`,
+      });
+
+    return res.status(200).json({ movies });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   searchMovies,
   createCuratedList,
@@ -169,4 +198,5 @@ module.exports = {
   addMovieToWishList,
   addToCuratedListItem,
   addReviewRatingToMovie,
+  searchMoviesByGenreAndActor,
 };
