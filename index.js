@@ -10,6 +10,7 @@ const {
   addReviewRatingToMovie,
   searchMoviesByGenreAndActor,
   sortMoviesByRatingOrReleaseyear,
+  getTop5Movies,
 } = require("./controllers/movieControllers");
 const { sequelize } = require("./models");
 require("pg");
@@ -28,6 +29,7 @@ app.post("/api/movies/curated-list", addToCuratedListItem);
 app.post("/api/movies/:movieId/reviews", addReviewRatingToMovie);
 app.get("/api/movies/searchByGenreAndActor", searchMoviesByGenreAndActor);
 app.get("/api/movies/sort", sortMoviesByRatingOrReleaseyear);
+app.get("/api/movies/top5", getTop5Movies);
 
 sequelize
   .authenticate()

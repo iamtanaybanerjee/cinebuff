@@ -4,6 +4,7 @@ const {
   watchlist: watchlistModel,
   wishlist: wishlistModel,
   curatedListItem: curatedListItemModel,
+  review: reviewModel,
 } = require("../models");
 const axiosInstance = require("../lib/axios.lib");
 const { Op } = require("sequelize");
@@ -242,9 +243,31 @@ const sortMovieRecords = (movieRecords, sortBy, order) => {
   return movies;
 };
 
+const getReviewList = async (movieId) => {
+  try {
+    const reviewList = await reviewModel.findAll({
+      where: { movieId },
+      attributes: ["rating", "reviewText"],
+    });
+
+    return reviewList;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sortMovesBasedOnRating = (movies) => {
+  const movieList = movies.sort(
+    (movie1, movie2) => movie2.rating - movie1.rating
+  );
+  return movieList;
+};
+
 module.exports = {
   updateACuratedList,
   saveMovie,
   searchByGenreAndActor,
   sortMovies,
+  getReviewList,
+  sortMovesBasedOnRating,
 };

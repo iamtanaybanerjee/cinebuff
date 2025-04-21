@@ -13,12 +13,15 @@ const {
 const {
   curatedList: curatedListModel,
   review: reviewModel,
+  movie: movieModel,
 } = require("../models");
 const {
   updateACuratedList,
   saveMovie,
   searchByGenreAndActor,
   sortMovies,
+  getReviewList,
+  sortMovesBasedOnRating,
 } = require("../services/movieServices");
 
 const searchMovies = async (req, res) => {
@@ -210,6 +213,54 @@ const sortMoviesByRatingOrReleaseyear = async (req, res) => {
   }
 };
 
+const getTop5Movies = async (req, res) => {
+  try {
+    const movieList = await movieModel.findAll();
+
+    if (movieList.length === 0)
+      return res.status(404).json({ message: "No movies are found" });
+
+    const movies = [];
+
+    for (let i = 0; i < movieList.length; i++) {
+      let reviewList = await getReviewList(movieList[i].id);
+
+      const reviews = [];
+
+      for (let i = 0; i < reviewList.length; i++) {
+        const reviewObj = {
+          ...reviewList[i].dataValues,
+          wordCount: reviewList[i].reviewText.length,
+        };
+        reviews.push(reviewObj);
+      }
+
+      let movieObj = {
+        ...movieList[i].dataValues,
+        reviews,
+      };
+      movies.push(movieObj);
+    }
+
+    //sort movies based on rating
+    const sortedTopmovies = sortMovesBasedOnRating(movies);
+
+    //the top 5 movies
+    const top5movies = [];
+
+    if (sortedTopmovies.length <= 5) top5movies = [...sortedTopmovies];
+    else {
+      for (let i = 0; i < 5; i++) {
+        top5movies.push(sortedTopmovies[i]);
+      }
+    }
+
+    return res.status(200).json({ movies: top5movies });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   searchMovies,
   createCuratedList,
@@ -220,4 +271,5 @@ module.exports = {
   addReviewRatingToMovie,
   searchMoviesByGenreAndActor,
   sortMoviesByRatingOrReleaseyear,
+  getTop5Movies,
 };
