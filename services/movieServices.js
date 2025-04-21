@@ -135,27 +135,116 @@ const getMovieCast = async (id) => {
 };
 
 const searchByGenreAndActor = async (genre, actor) => {
-  const genreList = genre.split(",").map((g) => g.trim());
-  const actorList = actor.split(",").map((a) => a.trim());
+  try {
+    const genreList = genre.split(",").map((g) => g.trim());
+    const actorList = actor.split(",").map((a) => a.trim());
 
-  const genreConditions = genreList.map((g) => ({
-    genre: {
-      [Op.like]: `%${g}%`,
-    },
-  }));
+    const genreConditions = genreList.map((g) => ({
+      genre: {
+        [Op.like]: `%${g}%`,
+      },
+    }));
 
-  const actorConditions = actorList.map((a) => ({
-    actors: {
-      [Op.like]: `%${a}%`,
-    },
-  }));
+    const actorConditions = actorList.map((a) => ({
+      actors: {
+        [Op.like]: `%${a}%`,
+      },
+    }));
 
-  const movies = await movieModel.findAll({
-    where: {
-      [Op.and]: [...genreConditions, ...actorConditions],
-    },
-  });
+    const movies = await movieModel.findAll({
+      where: {
+        [Op.and]: [...genreConditions, ...actorConditions],
+      },
+    });
+    return movies;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sortMovies = async (list, sortBy, order) => {
+  try {
+    const movies = await getMovieRecords(list, sortBy, order);
+    return movies;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getMovieRecords = async (list, sortBy, order) => {
+  try {
+    let listObjects;
+    if (list === "watchlist") {
+      listObjects = await watchlistModel.findAll({
+        attributes: ["movieId"],
+      });
+    } else if (list === "wishlist") {
+      listObjects = await wishlistModel.findAll({
+        attributes: ["movieId"],
+      });
+    } else {
+      const curatedListObjects = await curatedListModel.findAll();
+      const curatedListIds = [];
+      for (let i = 0; i < curatedListObjects.length; i++) {
+        curatedListIds.push(curatedListObjects[i].id);
+      }
+
+      listObjects = await curatedListItemModel.findAll({
+        where: { curatedListId: { [Op.in]: curatedListIds } },
+        attributes: ["movieId"],
+      });
+
+      console.log("listObjects", listObjects);
+    }
+
+    //getting the movieIds
+    const movieIds = [];
+    for (let i = 0; i < listObjects.length; i++) {
+      movieIds.push(listObjects[i].movieId);
+    }
+    console.log("movieIds", movieIds);
+
+    //getting the movieRecords for each movieId
+    const movieRecords = await movieModel.findAll({
+      where: {
+        id: { [Op.in]: movieIds },
+      },
+    });
+    console.log("movieRecords", movieRecords);
+    //sort this movieRecords
+    const movies = sortMovieRecords(movieRecords, sortBy, order);
+    return movies;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sortMovieRecords = (movieRecords, sortBy, order) => {
+  let movies;
+  if (order === "ASC" && sortBy === "rating")
+    movies = movieRecords.sort(
+      (movie1, movie2) => movie1.rating - movie2.rating
+    );
+  else if (order === "ASC" && sortBy === "releaseYear")
+    movies = movieRecords.sort(
+      (movie1, movie2) => movie1.releaseYear - movie2.releaseYear
+    );
+  else if (order === "DESC" && sortBy === "rating")
+    movies = movieRecords.sort(
+      (movie1, movie2) => movie2.rating - movie1.rating
+    );
+  else {
+    movies = movieRecords.sort(
+      (movie1, movie2) => movie2.releaseYear - movie1.releaseYear
+    );
+  }
+
   return movies;
 };
 
-module.exports = { updateACuratedList, saveMovie, searchByGenreAndActor };
+module.exports = {
+  updateACuratedList,
+  saveMovie,
+  searchByGenreAndActor,
+  sortMovies,
+};

@@ -76,6 +76,26 @@ const validateActor = (actor) => {
   return error;
 };
 
+const validateSortingQueryParams = (list, sortBy, order) => {
+  const errors = [];
+  if (
+    !list ||
+    list === "" ||
+    !(list === "wishlist" || list === "watchlist" || list === "curatedlist")
+  )
+    errors.push("List(wishlist or watchlist or curatedlist) is required");
+  if (
+    !sortBy ||
+    sortBy === "" ||
+    !(sortBy === "rating" || sortBy === "releaseYear")
+  )
+    errors.push("sortBy param is requied and must be rating or releaseYear");
+  if (!order || !(order === "ASC" || order === "DESC"))
+    errors.push("order is required and must be ASC or DESC");
+
+  return errors;
+};
+
 module.exports = {
   validateSearchQuery,
   validateCuratedListBodyParams,
@@ -85,4 +105,5 @@ module.exports = {
   validateMovieId,
   validateGenre,
   validateActor,
+  validateSortingQueryParams,
 };

@@ -8,6 +8,7 @@ const {
   validateMovieId,
   validateGenre,
   validateActor,
+  validateSortingQueryParams,
 } = require("../validations/validations");
 const {
   curatedList: curatedListModel,
@@ -17,6 +18,7 @@ const {
   updateACuratedList,
   saveMovie,
   searchByGenreAndActor,
+  sortMovies,
 } = require("../services/movieServices");
 
 const searchMovies = async (req, res) => {
@@ -190,6 +192,24 @@ const searchMoviesByGenreAndActor = async (req, res) => {
   }
 };
 
+const sortMoviesByRatingOrReleaseyear = async (req, res) => {
+  const list = req.query.list;
+  const sortBy = req.query.sortBy;
+  const order = req.query.order;
+  try {
+    const errors = validateSortingQueryParams(list, sortBy, order);
+    if (errors.length > 0) return res.status(400).json({ errors });
+
+    const movies = await sortMovies(list, sortBy, order);
+    if (movies.length === 0)
+      return res.status(404).json({ message: "No movies are found" });
+
+    return res.status(200).json({ movies });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   searchMovies,
   createCuratedList,
@@ -199,4 +219,5 @@ module.exports = {
   addToCuratedListItem,
   addReviewRatingToMovie,
   searchMoviesByGenreAndActor,
+  sortMoviesByRatingOrReleaseyear,
 };
