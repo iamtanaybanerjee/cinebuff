@@ -31,6 +31,7 @@ jest.mock("../validations/validations", () => ({
 jest.mock("../services/movieServices", () => ({
   getActorsList: jest.fn(),
   updateACuratedList: jest.fn(),
+  saveMovie: jest.fn(),
 }));
 jest.mock("../models", () => ({
   curatedList: {
@@ -431,5 +432,27 @@ describe("movie controller tests", () => {
 
     expect(res.json).toHaveBeenCalledWith(mockResponse);
     expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test("add movie to curated list", async () => {
+    const mockResponse = {
+      message: "Movie added to curatedList successfully.",
+    };
+
+    validateCuratedListId.mockResolvedValue(undefined);
+    saveMovie.mockResolvedValue(mockResponse);
+
+    const req = {
+      body: {
+        movieId: 37799,
+        curatedListId: 1,
+      },
+    };
+    const res = { json: jest.fn(), status: jest.fn(() => res) };
+
+    await addToCuratedListItem(req, res);
+
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
+    expect(res.status).toHaveBeenCalledWith(201);
   });
 });
