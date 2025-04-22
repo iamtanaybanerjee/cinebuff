@@ -33,6 +33,7 @@ jest.mock("../services/movieServices", () => ({
   updateACuratedList: jest.fn(),
   saveMovie: jest.fn(),
   searchByGenreAndActor: jest.fn(),
+  sortMovies: jest.fn(),
 }));
 jest.mock("../models", () => ({
   curatedList: {
@@ -501,6 +502,103 @@ describe("movie controller tests", () => {
     const res = { json: jest.fn(), status: jest.fn(() => res) };
 
     await searchMoviesByGenreAndActor(req, res);
+
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test("sort movies by rating or release-year", async () => {
+    const mockResponse = {
+      movies: [
+        {
+          id: 6,
+          title: "The Social Network",
+          tmdbId: 37799,
+          genre: "Drama",
+          actors:
+            "Jesse Eisenberg,Andrew Garfield,Armie Hammer,Josh Pence,Justin Timberlake",
+          releaseYear: 2010,
+          rating: 7.368,
+          description:
+            "In 2003, Harvard undergrad and computer programmer Mark Zuckerberg begins work on a new concept that eventually turns into the global social network known as Facebook. Six years later, Mark is one of the youngest billionaires ever, but his unprecedented success leads to both personal and legal complications when he ends up on the receiving end of two lawsuits, one involving his former friend.",
+        },
+        {
+          id: 1,
+          title: "Warrior",
+          tmdbId: 59440,
+          genre: "Drama,Action",
+          actors:
+            "Joel Edgerton,Tom Hardy,Nick Nolte,Jennifer Morrison,Frank Grillo",
+          releaseYear: 2011,
+          rating: 7.84,
+          description:
+            "The youngest son of an alcoholic former boxer returns home, where he's trained by his father for competition in a mixed martial arts tournament – a path that puts the fighter on a collision course with his estranged, older brother.",
+        },
+        {
+          id: 2,
+          title: "Inception",
+          tmdbId: 27205,
+          genre: "Action,Science Fiction,Adventure",
+          actors:
+            "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+          releaseYear: 2010,
+          rating: 8.4,
+          description:
+            "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+        },
+      ],
+    };
+
+    validateSortingQueryParams.mockReturnValue([]);
+    sortMovies.mockResolvedValue([
+      {
+        id: 6,
+        title: "The Social Network",
+        tmdbId: 37799,
+        genre: "Drama",
+        actors:
+          "Jesse Eisenberg,Andrew Garfield,Armie Hammer,Josh Pence,Justin Timberlake",
+        releaseYear: 2010,
+        rating: 7.368,
+        description:
+          "In 2003, Harvard undergrad and computer programmer Mark Zuckerberg begins work on a new concept that eventually turns into the global social network known as Facebook. Six years later, Mark is one of the youngest billionaires ever, but his unprecedented success leads to both personal and legal complications when he ends up on the receiving end of two lawsuits, one involving his former friend.",
+      },
+      {
+        id: 1,
+        title: "Warrior",
+        tmdbId: 59440,
+        genre: "Drama,Action",
+        actors:
+          "Joel Edgerton,Tom Hardy,Nick Nolte,Jennifer Morrison,Frank Grillo",
+        releaseYear: 2011,
+        rating: 7.84,
+        description:
+          "The youngest son of an alcoholic former boxer returns home, where he's trained by his father for competition in a mixed martial arts tournament – a path that puts the fighter on a collision course with his estranged, older brother.",
+      },
+      {
+        id: 2,
+        title: "Inception",
+        tmdbId: 27205,
+        genre: "Action,Science Fiction,Adventure",
+        actors:
+          "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+        releaseYear: 2010,
+        rating: 8.4,
+        description:
+          "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+      },
+    ]);
+
+    const req = {
+      query: {
+        list: "curatedlist",
+        sortBy: "rating",
+        order: "ASC",
+      },
+    };
+    const res = { json: jest.fn(), status: jest.fn(() => res) };
+
+    await sortMoviesByRatingOrReleaseyear(req, res);
 
     expect(res.json).toHaveBeenCalledWith(mockResponse);
     expect(res.status).toHaveBeenCalledWith(200);
