@@ -31,6 +31,14 @@ jest.mock("../validations/validations", () => ({
 jest.mock("../services/movieServices", () => ({
   getActorsList: jest.fn(),
 }));
+jest.mock("../models", () => ({
+  curatedList: {
+    create: jest.fn(),
+    // findOne: jest.fn(),
+  },
+}));
+
+const { curatedList: curatedListModel } = require("../models");
 
 const {
   validateSearchQuery,
@@ -358,5 +366,39 @@ describe("movie controller tests", () => {
 
     // expect(axiosInstance.get).toHaveBeenCalledWith(`/search/movie?query=`)
     expect(res.json).toHaveBeenCalledWith(mockResponse);
+  });
+
+  test("create curated list", async () => {
+    const mockResponse = {
+      message: "Curated list created successfully",
+      curatedList: {
+        id: 2,
+        name: "Horror Movies 2",
+        description: "A collection of the best horror films.",
+        slug: "horror-movies",
+      },
+    };
+
+    validateCuratedListBodyParams.mockReturnValue([]);
+    curatedListModel.create.mockResolvedValue({
+      id: 2,
+      name: "Horror Movies 2",
+      description: "A collection of the best horror films.",
+      slug: "horror-movies",
+    });
+
+    const req = {
+      body: {
+        name: "Horror Movies 2",
+        description: "A collection of the best horror films.",
+        slug: "horror-movies",
+      },
+    };
+    const res = { json: jest.fn(), status: jest.fn(() => res) };
+
+    await createCuratedList(req, res);
+
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
+    expect(res.status).toHaveBeenCalledWith(201);
   });
 });
