@@ -30,6 +30,7 @@ jest.mock("../validations/validations", () => ({
 }));
 jest.mock("../services/movieServices", () => ({
   getActorsList: jest.fn(),
+  updateACuratedList: jest.fn(),
 }));
 jest.mock("../models", () => ({
   curatedList: {
@@ -400,5 +401,35 @@ describe("movie controller tests", () => {
 
     expect(res.json).toHaveBeenCalledWith(mockResponse);
     expect(res.status).toHaveBeenCalledWith(201);
+  });
+
+  test("update curated list", async () => {
+    const mockResponse = {
+      message: "Curated list updated successfully.",
+      updatedCuratedList: {
+        id: 2,
+        name: "Horror Movies 2",
+        slug: "horror-movies",
+        description: "A collection of more scary movies",
+      },
+    };
+
+    validateUpdateCuratedListBodyParams.mockReturnValue([]);
+    updateACuratedList.mockResolvedValue(mockResponse);
+
+    const req = {
+      body: {
+        description: "A collection of more scary movies",
+      },
+      params: {
+        curatedListId: 2,
+      },
+    };
+    const res = { json: jest.fn(), status: jest.fn(() => res) };
+
+    await updateCuratedList(req, res);
+
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
+    expect(res.status).toHaveBeenCalledWith(200);
   });
 });
