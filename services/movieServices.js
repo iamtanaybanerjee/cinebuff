@@ -263,6 +263,24 @@ const sortMovesBasedOnRating = (movies) => {
   return movieList;
 };
 
+const getActorsList = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/movie/${id}/credits`);
+
+    const actorList = [];
+
+    for (let i = 0; i < response.data.cast.length; i++) {
+      let items = response.data.cast;
+      if (items[i].known_for_department === "Acting")
+        actorList.push(items[i].name);
+    }
+
+    return actorList;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   updateACuratedList,
   saveMovie,
@@ -270,4 +288,5 @@ module.exports = {
   sortMovies,
   getReviewList,
   sortMovesBasedOnRating,
+  getActorsList,
 };

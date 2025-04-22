@@ -22,6 +22,7 @@ const {
   sortMovies,
   getReviewList,
   sortMovesBasedOnRating,
+  getActorsList,
 } = require("../services/movieServices");
 
 const searchMovies = async (req, res) => {
@@ -57,23 +58,23 @@ const searchMovies = async (req, res) => {
   }
 };
 
-const getActorsList = async (id) => {
-  try {
-    const response = await axiosInstance.get(`/movie/${id}/credits`);
+// const getActorsList = async (id) => {
+//   try {
+//     const response = await axiosInstance.get(`/movie/${id}/credits`);
 
-    const actorList = [];
+//     const actorList = [];
 
-    for (let i = 0; i < response.data.cast.length; i++) {
-      let items = response.data.cast;
-      if (items[i].known_for_department === "Acting")
-        actorList.push(items[i].name);
-    }
+//     for (let i = 0; i < response.data.cast.length; i++) {
+//       let items = response.data.cast;
+//       if (items[i].known_for_department === "Acting")
+//         actorList.push(items[i].name);
+//     }
 
-    return actorList;
-  } catch (error) {
-    throw error;
-  }
-};
+//     return actorList;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 const createCuratedList = async (req, res) => {
   const body = req.body;
