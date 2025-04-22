@@ -23,6 +23,7 @@ const {
   getReviewList,
   sortMovesBasedOnRating,
   getActorsList,
+  getAllMoviesWithReviewList,
 } = require("../services/movieServices");
 
 const searchMovies = async (req, res) => {
@@ -203,27 +204,10 @@ const getTop5Movies = async (req, res) => {
     if (movieList.length === 0)
       return res.status(404).json({ message: "No movies are found" });
 
-    const movies = [];
+    let movies;
 
-    for (let i = 0; i < movieList.length; i++) {
-      let reviewList = await getReviewList(movieList[i].id);
-
-      const reviews = [];
-
-      for (let i = 0; i < reviewList.length; i++) {
-        const reviewObj = {
-          ...reviewList[i].dataValues,
-          wordCount: reviewList[i].reviewText.length,
-        };
-        reviews.push(reviewObj);
-      }
-
-      let movieObj = {
-        ...movieList[i].dataValues,
-        reviews,
-      };
-      movies.push(movieObj);
-    }
+    //get all movies with their review-list
+    movies = await getAllMoviesWithReviewList(movieList);
 
     //sort movies based on rating
     const sortedTopmovies = sortMovesBasedOnRating(movies);
@@ -231,7 +215,7 @@ const getTop5Movies = async (req, res) => {
     //the top 5 movies
     const top5movies = [];
 
-    if (sortedTopmovies.length <= 5) top5movies = [...sortedTopmovies];
+    if (sortedTopmovies.length <= 5) top5movies.push(...sortedTopmovies);
     else {
       for (let i = 0; i < 5; i++) {
         top5movies.push(sortedTopmovies[i]);
@@ -243,6 +227,10 @@ const getTop5Movies = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+// const getAllMovies = async (req, res) => {
+
+// }
 
 module.exports = {
   searchMovies,

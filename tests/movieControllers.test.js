@@ -1,4 +1,5 @@
 const axiosInstance = require("../lib/axios.lib");
+const httpMocks = require("node-mocks-http");
 const {
   searchMovies,
   createCuratedList,
@@ -34,15 +35,23 @@ jest.mock("../services/movieServices", () => ({
   saveMovie: jest.fn(),
   searchByGenreAndActor: jest.fn(),
   sortMovies: jest.fn(),
+  getAllMoviesWithReviewList: jest.fn(),
+  sortMovesBasedOnRating: jest.fn(),
 }));
 jest.mock("../models", () => ({
   curatedList: {
     create: jest.fn(),
     // findOne: jest.fn(),
   },
+  movie: {
+    findAll: jest.fn(),
+  },
 }));
 
-const { curatedList: curatedListModel } = require("../models");
+const {
+  curatedList: curatedListModel,
+  movie: movieModel,
+} = require("../models");
 
 const {
   validateSearchQuery,
@@ -64,6 +73,7 @@ const {
   getReviewList,
   sortMovesBasedOnRating,
   getActorsList,
+  getAllMoviesWithReviewList,
 } = require("../services/movieServices");
 
 describe("movie controller tests", () => {
@@ -601,6 +611,178 @@ describe("movie controller tests", () => {
     await sortMoviesByRatingOrReleaseyear(req, res);
 
     expect(res.json).toHaveBeenCalledWith(mockResponse);
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it("should return top 5 movies with status 200", async () => {
+    const mockResponse = {
+      movies: [
+        {
+          id: 1,
+          title: "Inception",
+          tmdbId: 27205,
+          genre: "Action,Science Fiction,Adventure",
+          actors:
+            "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+          releaseYear: 2010,
+          rating: 8.4,
+          description:
+            "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+          reviews: [
+            {
+              rating: 9,
+              reviewText: "Great movie.",
+              wordCount: 12,
+            },
+            {
+              rating: 9,
+              reviewText: "Great movie.",
+              wordCount: 12,
+            },
+            {
+              rating: 9.5,
+              reviewText: "Great movie.",
+              wordCount: 12,
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: "The Intouchables",
+          tmdbId: 77338,
+          genre: "Drama,Comedy",
+          actors:
+            "François Cluzet,Omar Sy,Dominique Henry,Anne Le Ny,Clotilde Mollet",
+          releaseYear: 2011,
+          rating: 8.272,
+          description:
+            "A true story of two men who should never have met – a quadriplegic aristocrat who was injured in a paragliding accident and a young man from the projects.",
+          reviews: [],
+        },
+      ],
+    };
+    movieModel.findAll.mockResolvedValue([
+      {
+        id: 1,
+        title: "Inception",
+        tmdbId: 27205,
+        genre: "Action,Science Fiction,Adventure",
+        actors:
+          "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+        releaseYear: 2010,
+        rating: 8.4,
+        description:
+          "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+      },
+      {
+        id: 2,
+        title: "The Intouchables",
+        tmdbId: 77338,
+        genre: "Drama,Comedy",
+        actors:
+          "François Cluzet,Omar Sy,Dominique Henry,Anne Le Ny,Clotilde Mollet",
+        releaseYear: 2011,
+        rating: 8.272,
+        description:
+          "A true story of two men who should never have met – a quadriplegic aristocrat who was injured in a paragliding accident and a young man from the projects.",
+      },
+    ]);
+    getAllMoviesWithReviewList.mockResolvedValue([
+      {
+        id: 1,
+        title: "Inception",
+        tmdbId: 27205,
+        genre: "Action,Science Fiction,Adventure",
+        actors:
+          "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+        releaseYear: 2010,
+        rating: 8.4,
+        description:
+          "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+        reviews: [
+          {
+            rating: 9,
+            reviewText: "Great movie.",
+            wordCount: 12,
+          },
+          {
+            rating: 9,
+            reviewText: "Great movie.",
+            wordCount: 12,
+          },
+          {
+            rating: 9.5,
+            reviewText: "Great movie.",
+            wordCount: 12,
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: "The Intouchables",
+        tmdbId: 77338,
+        genre: "Drama,Comedy",
+        actors:
+          "François Cluzet,Omar Sy,Dominique Henry,Anne Le Ny,Clotilde Mollet",
+        releaseYear: 2011,
+        rating: 8.272,
+        description:
+          "A true story of two men who should never have met – a quadriplegic aristocrat who was injured in a paragliding accident and a young man from the projects.",
+        reviews: [],
+      },
+    ]);
+    sortMovesBasedOnRating.mockReturnValue([
+      {
+        id: 1,
+        title: "Inception",
+        tmdbId: 27205,
+        genre: "Action,Science Fiction,Adventure",
+        actors:
+          "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+        releaseYear: 2010,
+        rating: 8.4,
+        description:
+          "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+        reviews: [
+          {
+            rating: 9,
+            reviewText: "Great movie.",
+            wordCount: 12,
+          },
+          {
+            rating: 9,
+            reviewText: "Great movie.",
+            wordCount: 12,
+          },
+          {
+            rating: 9.5,
+            reviewText: "Great movie.",
+            wordCount: 12,
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: "The Intouchables",
+        tmdbId: 77338,
+        genre: "Drama,Comedy",
+        actors:
+          "François Cluzet,Omar Sy,Dominique Henry,Anne Le Ny,Clotilde Mollet",
+        releaseYear: 2011,
+        rating: 8.272,
+        description:
+          "A true story of two men who should never have met – a quadriplegic aristocrat who was injured in a paragliding accident and a young man from the projects.",
+        reviews: [],
+      },
+    ]);
+
+    const req = {};
+    const res = { json: jest.fn(), status: jest.fn(() => res) };
+
+    await getTop5Movies(req, res);
+
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
+
     expect(res.status).toHaveBeenCalledWith(200);
   });
 });

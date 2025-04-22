@@ -281,6 +281,32 @@ const getActorsList = async (id) => {
   }
 };
 
+const getAllMoviesWithReviewList = async (movieList) => {
+  const movies = [];
+  for (let i = 0; i < movieList.length; i++) {
+    let reviewList = await getReviewList(movieList[i].id);
+
+    const reviews = [];
+
+    for (let i = 0; i < reviewList.length; i++) {
+      const reviewObj = {
+        ...reviewList[i].dataValues,
+        wordCount: reviewList[i].reviewText.length,
+      };
+      reviews.push(reviewObj);
+    }
+
+    let movieObj = {
+      ...movieList[i].dataValues,
+      reviews,
+    };
+    movies.push(movieObj);
+    // console.log("movies", movies);
+  }
+
+  return movies;
+};
+
 module.exports = {
   updateACuratedList,
   saveMovie,
@@ -289,4 +315,5 @@ module.exports = {
   getReviewList,
   sortMovesBasedOnRating,
   getActorsList,
+  getAllMoviesWithReviewList,
 };
