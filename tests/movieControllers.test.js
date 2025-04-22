@@ -32,6 +32,7 @@ jest.mock("../services/movieServices", () => ({
   getActorsList: jest.fn(),
   updateACuratedList: jest.fn(),
   saveMovie: jest.fn(),
+  searchByGenreAndActor: jest.fn(),
 }));
 jest.mock("../models", () => ({
   curatedList: {
@@ -454,5 +455,54 @@ describe("movie controller tests", () => {
 
     expect(res.json).toHaveBeenCalledWith(mockResponse);
     expect(res.status).toHaveBeenCalledWith(201);
+  });
+
+  test("search movies by genre and actor", async () => {
+    const mockResponse = {
+      movies: [
+        {
+          id: 2,
+          title: "Inception",
+          tmdbId: 27205,
+          genre: "Action,Science Fiction,Adventure",
+          actors:
+            "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+          releaseYear: 2010,
+          rating: 8.4,
+          description:
+            "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+        },
+      ],
+    };
+
+    validateGenre.mockReturnValue(undefined);
+    validateActor.mockReturnValue(undefined);
+    searchByGenreAndActor.mockResolvedValue([
+      {
+        id: 2,
+        title: "Inception",
+        tmdbId: 27205,
+        genre: "Action,Science Fiction,Adventure",
+        actors:
+          "Leonardo DiCaprio,Joseph Gordon-Levitt,Ken Watanabe,Tom Hardy,Elliot Page",
+        releaseYear: 2010,
+        rating: 8.4,
+        description:
+          "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets is offered a chance to regain his old life as payment for a task considered to be impossible: \"inception\", the implantation of another person's idea into a target's subconscious.",
+      },
+    ]);
+
+    const req = {
+      query: {
+        genre: "Action",
+        actor: "Leonardo DiCaprio",
+      },
+    };
+    const res = { json: jest.fn(), status: jest.fn(() => res) };
+
+    await searchMoviesByGenreAndActor(req, res);
+
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
+    expect(res.status).toHaveBeenCalledWith(200);
   });
 });
