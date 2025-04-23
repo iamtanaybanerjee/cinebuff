@@ -29,12 +29,4 @@
 
 👉 [cinebuff on Vercel](https://cinebuff-seven.vercel.app/)
 
-## 🧪 Running Locally
 
-To run the project locally:
-
-```bash
-git clone https://github.com/your-username/cinebuff.git
-cd cinebuff
-npm install
-npm start
