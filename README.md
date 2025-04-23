@@ -4,8 +4,8 @@
 
 ## 🌟 Features
 
-- 🔍 **Search Movies**: Make API calls to TMDB to search movies by keyword.
 - 🧩 **Data Modeling**: Designed a relational database with Sequelize models and associations.
+- 🔍 **Search Movies**: Make API calls to TMDB to search movies by keyword.
 - 🗂️ **Curated Lists**: Create curated movie lists with custom names, descriptions, and slugs.
 - ✏️ **List Management**: Rename lists and edit short descriptions.
 - 🎞️ **Watchlist & Wishlist**: Save movies to personal watchlist, wishlist, or curated lists.
