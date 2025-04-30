@@ -25,10 +25,10 @@ app.get("/", (req, res) => {
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Docman API</title>
+        <title>Cinebuff API</title>
       </head>
       <body>
-        <h1>Welcome to the Docman Backend</h1>
+        <h1>Welcome to the Cinebuff Backend</h1>
         <p>This is the backend server. Please use the API routes to interact with the service.</p>
       </body>
     </html>
