@@ -20,6 +20,21 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Docman API</title>
+      </head>
+      <body>
+        <h1>Welcome to the Docman Backend</h1>
+        <p>This is the backend server. Please use the API routes to interact with the service.</p>
+      </body>
+    </html>
+  `);
+});
+
 app.get("/api/movies/search", searchMovies);
 app.post("/api/curated-lists", createCuratedList);
 app.put("/api/curated-lists/:curatedListId", updateCuratedList);
