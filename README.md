@@ -25,8 +25,5 @@
 - **External API**: [TMDB API](https://www.themoviedb.org/documentation/api)  
 - **Deployment**: Vercel  
 
-## 🚀 Live Demo
-
-👉 [cinebuff on Vercel](https://cinebuff-seven.vercel.app/)
 
 
