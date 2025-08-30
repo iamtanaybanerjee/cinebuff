@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const {
   searchMovies,
   createCuratedList,
@@ -12,6 +13,10 @@ const {
   sortMoviesByRatingOrReleaseyear,
   getTop5Movies,
 } = require("./controllers/movieControllers");
+const {
+  spotifyLogin,
+  spotifyCallback,
+} = require("./controllers/spotifyControllers");
 const { sequelize } = require("./models");
 require("pg");
 
@@ -19,6 +24,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send(`
@@ -45,6 +51,9 @@ app.post("/api/movies/:movieId/reviews", addReviewRatingToMovie);
 app.get("/api/movies/searchByGenreAndActor", searchMoviesByGenreAndActor);
 app.get("/api/movies/sort", sortMoviesByRatingOrReleaseyear);
 app.get("/api/movies/top5", getTop5Movies);
+//spotify oauth routes
+app.get("/api/spotify", spotifyLogin);
+app.get("/api/spotify/callback", spotifyCallback);
 
 sequelize
   .authenticate()
